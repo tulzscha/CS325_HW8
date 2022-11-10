@@ -7,37 +7,42 @@ import heapq
 
 # DFS
 
-def solve_puzzle(Board, Source, Destination, directions=None, steps=None, seen=None):
+def solve_puzzle(Board, Source, Destination):
+
+    # seen = set of coords
+    # steps = string
+    seen = set()
+    steps = ""
+
+    # call function
+    steps = _solver(Board, Source, Destination, seen, steps)
+
+    # if no solutions, return None
+    if not steps:
+        return None
+
+    steps.sort(key=len)
+
+    return steps
 
 
-    if directions is None:
-        directions = []
-    if steps is None:
-        steps = ""
-    if seen is None:
-        seen = []
+def _solver(board, source, dest, seen, steps):
 
+    if source == dest:
+        return [steps]                                      # we win
 
-    if Source == Destination:
-        return directions, steps                   # we win
+    cur_steps = []
 
-    neighbors = _adjacents(Board, Source, seen)
+    neighbors = _adjacents(board, source, seen)
 
-    if not neighbors:                       # no neighbors
-        return                              # will this finish out deadending?
-
-    seen.append(Source)
-    print(seen)
-
-    pass
-
-
-#
-# traversal - recursive(G, s):
-# mark s as visited
-# for all neighbours w of s in Graph G:
-#   if w is not visited:
-#     traversal - recursive(G, w)
+    for neigh in neighbors:
+        if neigh[0] not in seen:
+            seen.add(neigh[0])
+            temp = _solver(board, neigh[0], dest, seen, steps + neigh[1])
+            if temp:
+                cur_steps += temp
+            seen.discard(neigh[0])
+    return cur_steps
 
 
 def _adjacents(puzzle, source, seen):
@@ -78,7 +83,7 @@ def _is_valid_position(x, y, width, height, puzzle, seen):
 
     if x < 0 or y < 0 or x > width - 1 or y > height - 1:
         return 0
-    if (x, y) in seen or puzzle[x][y] == "#":
+    if puzzle[x][y] == "#": # or (x, y) in seen:
         return 0
     return 1
 
@@ -89,6 +94,26 @@ Puzzle = [
     ['-', '-', '-', '-', '-'],
     ['#', '-', '#', '#', '-'],
     ['-', '#', '-', '-', '-']
-]
+    ]
 
-solve_puzzle(Puzzle, (0,0), (4,4) )
+print(solve_puzzle(Puzzle, (0,0), (4,4)))
+
+Puzzle = [
+    ['-', '-', '-', '-', '-'],
+    ['-', '-', '#', '-', '-'],
+    ['-', '-', '-', '-', '-'],
+    ['#', '-', '#', '#', '-'],
+    ['-', '#', '-', '-', '-']
+    ]
+
+print(solve_puzzle(Puzzle, (4,0), (4,4)))
+
+Puzzle = [
+    ['-', '-', '-', '-', '-'],
+    ['-', '-', '#', '-', '-'],
+    ['-', '-', '-', '-', '-'],
+    ['#', '-', '#', '#', '-'],
+    ['-', '#', '-', '-', '-']
+    ]
+
+print(solve_puzzle(Puzzle, (0,2), (2,2)))
