@@ -2,106 +2,60 @@
 # CS325 Homework 8
 # Minimum Spanning Tree
 
-import heapq
-
-
-
 
 def Prims(G):
     """
-
-    :param G:
-    :return:
+    Returns the Minimum Spanning Tree of graph G.
+    :param G: Graph to traverse, in adjacency matrix form
+    :return: List of tuples, where each tuple is represents two nodes and the value of the connecting edge.
     """
-    # num vertexes
+    # num of vertexes
     num_v = len(G)
 
-    # Create lists
-    dist = [float("infinity") for _ in G]
-    prev = [None for _ in G]
-    visited = []
-    MST = []
+    # init the tracking lists
+    dist = [float("infinity")] * num_v
+    prev = [None] * num_v
 
-
-    # initialize start
     dist[0] = 0
     prev[0] = 0
 
+    visited = []
+    MST = []
 
-    # create heap
-    pq = []
-
-    # initialize heap with starting values
+    # populate neighbors in dist and prev
     for n in range(1, num_v):
         if G[0][n] > 0:
-            heapq.heappush(pq, (G[0][n], n, 0))
+            dist[n] = G[0][n]
+            prev[n] = 0
 
-
-    print(dist)
-    print(prev)
-
+    # print(dist)
+    # print(prev)
 
     while len(visited) < num_v:
-        current_node = heapq.heappop(pq)
-        MST.append((current_node[2], current_node[1], current_node[0]))
 
+        # here we extract the index of the minimum distance
+        minimum = float("infinity")
+        for v in range(num_v):
+            if dist[v] < minimum and v not in visited:
+                minimum = dist[v]
+                min_index = v
 
-        neighbors = []
-        for n in range(num_v):
-            if G[current_node[1]][n] > 0:
-                if n not in visited:
-                    neighbors.append(n)
-                    heapq.heappush(pq, (G[current_node[1]][n], n, current_node[1]))
+        # add to visited
+        visited.append(min_index)
 
-       # for node in neighbors:
+        # print(visited)
+        MST.append((prev[min_index], min_index, minimum))
 
-        visited.append(current_node[1])
+        for v in range(num_v):
 
-
-        print(MST)
-        print(neighbors)
-        print(pq)
-
-     #   break
-    #     CurrentNode = unvisited vertex v with smallest dist[v]
-    #     MST.add((prevNode, CurrentNode))
-    #     for node in CurrentNode.neighbours:
-    #         dist[node] = min(w(CurrentNode, node), dist[node])
-    #         if dist[node] updated: prev[node] = CurrentNode
-    #     visited.add(CurrentNode)
-    # return MST
-
-    pass
-    
-
-"""
-    s <- pick a source vertex from V
-
-    for v in V: #v: current vertex; V: all the vertices in G
-        dist[v] = infinity
-        prev[v] = Empty
-
-    #initalize source
-    dist[v] = 0
-    prev[v] = s
-
-    #update neighbouring nodes of s
-    for node in s.neighbours
-        dist[v] = weight of (s,node)
-        prev[v] = s
-
-    while(len(visited)<len(V)):
-        CurrentNode = unvisited vertex v with smallest dist[v]
-        MST.add((prevNode, CurrentNode))
-        for node in CurrentNode.neighbours:
-            dist[node] = min(w(CurrentNode, node), dist[node])
-            if dist[node] updated: prev[node] = CurrentNode
-        visited.add(CurrentNode)
+            if G[min_index][v] > 0 and v not in visited and dist[v] > G[min_index][v]:
+                dist[v] = G[min_index][v]
+                prev[v] = min_index
+    #
+    # print(dist)
+    # print(prev)
+    MST.remove((0, 0, 0))
     return MST
-
-
-
-"""
 
 G = [
  [0, 8, 5, 0, 0, 0, 0],
@@ -114,4 +68,4 @@ G = [
 ]
 
 
-Prims(G)
+print(Prims(G))
