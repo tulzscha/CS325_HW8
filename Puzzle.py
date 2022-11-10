@@ -2,10 +2,6 @@
 # CS325 Homework 8
 # Puzzle Traversal Assignment.
 
-import heapq
-
-
-# DFS
 
 def solve_puzzle(Board, Source, Destination):
 
@@ -23,9 +19,10 @@ def solve_puzzle(Board, Source, Destination):
 
     # find shortest path
     steps.sort(key=len)
+    print(len(steps))
     steps = steps[0]
 
-    # make tuple route
+    # make route
     route = route_construct(Source, steps)
 
     # done!
