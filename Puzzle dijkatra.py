@@ -6,6 +6,17 @@ import heapq
 
 
 def solve_puzzle(Board, Source, Destination):
+
+    effort_dic = calculate_effort(Board, Source, Destination)
+
+    if not effort_dic:
+        return None
+
+    path = create_trace(effort_dic, Source, Destination)
+
+    return path
+
+def calculate_effort(Board, Source, Destination):
     """
     Returns minimum effort necessary to solve the 3d puzzle contained within "puzzle"
     :param puzzle: puzzle to be solved
@@ -24,9 +35,10 @@ def solve_puzzle(Board, Source, Destination):
     efforts[Source[0], Source[1]] = 0                               # overwrite starting effort
 
     # start priority queue, with effort and coords of top-left
+    path = ""
+
     pq = [(0, (Source[0], Source[1]))]
 
-    path = ""
 
     # here be a standard-ish Djikstra loop, with a few caveats
     while len(pq) > 0:
@@ -38,7 +50,7 @@ def solve_puzzle(Board, Source, Destination):
 
         # return if we reach "lower-right" node
         if current_vertex == (Destination[0], Destination[1]):
-            return current_effort
+            return efforts
 
         # generate list of adjacent neighbors, and effort values (aka the edges)
         neighbors = _adjacent_elements(Board, current_vertex[0], current_vertex[1])
@@ -52,6 +64,42 @@ def solve_puzzle(Board, Source, Destination):
             if min_eff < efforts[neighbor]:
                 efforts[neighbor] = min_eff
                 heapq.heappush(pq, (min_eff, neighbor))
+
+
+def create_trace(effort, source, dest):
+
+    moves = []
+    visited = []
+
+    cur_node = dest
+    cur_eff = effort[dest]
+
+    while cur_eff > 0:
+        visited.append(cur_node)
+
+        cur_eff -= 1
+
+        if (cur_node[0] - 1, cur_node[1]) in effort and effort[(cur_node[0] - 1, cur_node[1])] == cur_eff:
+            moves.append("D")
+            cur_node = (cur_node[0] - 1, cur_node[1])
+        elif (cur_node[0] + 1, cur_node[1]) in effort and effort[(cur_node[0] + 1, cur_node[1])] == cur_eff:
+            moves.append("U")
+            cur_node = (cur_node[0] + 1, cur_node[1])
+        elif (cur_node[0], cur_node[1] - 1) in effort and effort[(cur_node[0], cur_node[1] - 1)] == cur_eff:
+            moves.append("R")
+            cur_node = (cur_node[0], cur_node[1] - 1)
+        elif (cur_node[0], cur_node[1] + 1) in effort and effort[(cur_node[0], cur_node[1] + 1)] == cur_eff:
+            moves.append("L")
+            cur_node = (cur_node[0], cur_node[1] + 1)
+
+    movstring = ""
+    for i in range(len(moves)-1, -1, -1):
+        movstring += moves[i]
+
+    visited.append(source)
+    visited.reverse()
+
+    return visited, movstring
 
 
 def _is_valid_position(x, y, width, height, puzzle):
@@ -129,3 +177,13 @@ Puzzle = [
     ]
 
 print(solve_puzzle(Puzzle, (0,2), (2,2)))
+
+Puzzle = [
+    ['-', '-', '-', '-', '-'],
+    ['-', '-', '-', '-', '-'],
+    ['-', '-', '-', '-', '-'],
+    ['-', '-', '-', '-', '-'],
+    ['-', '-', '-', '-', '-']
+    ]
+
+print(solve_puzzle(Puzzle, (0,0), (4,4)))
