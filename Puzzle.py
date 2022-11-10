@@ -4,21 +4,33 @@
 
 import heapq
 
+
 # DFS
 
-def solve_puzzle(Board, Source, Destination, seen = None, directions = None):
-    """
-
-    :param Board:
-    :param Source:
-    :param Destination:
-    :return:
-    """
+def solve_puzzle(Board, Source, Destination, directions=None, steps=None, seen=None):
 
 
-    #_puzzle(Board, Source, Destination, )
+    if directions is None:
+        directions = []
+    if steps is None:
+        steps = ""
+    if seen is None:
+        seen = []
+
+
+    if Source == Destination:
+        return directions, steps                   # we win
+
+    neighbors = _adjacents(Board, Source, seen)
+
+    if not neighbors:                       # no neighbors
+        return                              # will this finish out deadending?
+
+    seen.append(Source)
+    print(seen)
 
     pass
+
 
 #
 # traversal - recursive(G, s):
@@ -28,30 +40,33 @@ def solve_puzzle(Board, Source, Destination, seen = None, directions = None):
 #     traversal - recursive(G, w)
 
 
-def _adjacents(puzzle, x, y, seen):
-
+def _adjacents(puzzle, source, seen):
     # Size of given 2d array
     n = len(puzzle)
     m = len(puzzle[0])
+
+    x = source[0]
+    y = source[1]
 
     # result list
     results = []
 
     # Checking for all the possible adjacent positions; adding to results if they are
     # Appends [(x, y), effort] for each allowable neighbor
-    if _is_valid_position(x - 1, y, n, m):
-        results.append([(x - 1, y), abs(puzzle[x][y] - puzzle[x - 1][y])])
-    if _is_valid_position(x + 1, y, n, m):
-        results.append([(x + 1, y), abs(puzzle[x][y] - puzzle[x + 1][y])])
-    if _is_valid_position(x, y - 1, n, m):
-        results.append([(x, y - 1), abs(puzzle[x][y] - puzzle[x][y - 1])])
-    if _is_valid_position(x, y + 1, n, m):
-        results.append([(x, y + 1), abs(puzzle[x][y] - puzzle[x][y + 1])])
+    if _is_valid_position(x-1, y, n, m, puzzle, seen):
+        results.append([(x-1, y), "U"])
+    if _is_valid_position(x+1, y, n, m, puzzle, seen):
+        results.append([(x+1, y), "D"])
+    if _is_valid_position(x, y-1, n, m, puzzle, seen):
+        results.append([(x, y-1), "L"])
+    if _is_valid_position(x, y+1, n, m, puzzle, seen):
+        results.append([(x, y+1), "R"])
 
     # done
     return results
 
-def _is_valid_position(x, y, puzzle, seen ):
+
+def _is_valid_position(x, y, width, height, puzzle, seen):
     """
 
     :param x:
@@ -60,14 +75,20 @@ def _is_valid_position(x, y, puzzle, seen ):
     :param seen:
     :return:
     """
+
     if x < 0 or y < 0 or x > width - 1 or y > height - 1:
+        return 0
+    if (x, y) in seen or puzzle[x][y] == "#":
         return 0
     return 1
 
+
 Puzzle = [
- ['-', '-', '-', '-', '-'],
- ['-', '-', '#', '-', '-'],
- ['-', '-', '-', '-', '-'],
- ['#', '-', '#', '#', '-'],
- ['-', '#', '-', '-', '-']
+    ['-', '-', '-', '-', '-'],
+    ['-', '-', '#', '-', '-'],
+    ['-', '-', '-', '-', '-'],
+    ['#', '-', '#', '#', '-'],
+    ['-', '#', '-', '-', '-']
 ]
+
+solve_puzzle(Puzzle, (0,0), (4,4) )
